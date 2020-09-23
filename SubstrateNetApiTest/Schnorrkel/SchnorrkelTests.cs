@@ -1,7 +1,10 @@
 using NUnit.Framework;
 using Schnorrkel;
+using Schnorrkel.Keys;
+using Schnorrkel.Scalars;
 using SubstrateNetApi;
 using System;
+using System.Linq;
 
 namespace SubstrateNetApiTests.Schnorrkel
 {
@@ -21,16 +24,22 @@ namespace SubstrateNetApiTests.Schnorrkel
         }
 
         [Test]
-        public void ShouldGenerateKeypair11Test()
+        public void GenerateKeypairTest()
         {
-            //var seed0x = "0xa81056d713af1ff17b599e60d287952e89301b5208324a0529b62dc7369c745defc9c8dd67b7c59b201bc164163a8978d40010c22743db142a47f2e064480d4b";
+            var keyPair = KeyPair.generateKeyPair();
 
-            //byte[] seed = Utils.HexToByteArray(seed0x);
+            byte[] pubKey = keyPair.PublicKey.Key;
+            byte[] secKey = keyPair.PrivateKey.Key.Concat(keyPair.PrivateKey.Nonce).ToArray();
+            
+            int messageLength = _random.Next(10, 200);
+            var message = new byte[messageLength];
+            _random.NextBytes(message);
 
-            //var secretKey = SecretKey.FromBytes011(seed);
+            //var message = signaturePayloadBytes.AsMemory().Slice(0, (int)payloadLength).ToArray();
+            var simpleSign = Sr25519v091.SignSimple(pubKey, secKey, message);
 
-            //Assert.AreEqual("0x15C2EA7AE2F5237E2FCB134CFAB0D2251166430A4146A920C5B6E5D88693AE0B", Utils.Bytes2HexString(secretKey.key.GetBytes()));
-            //Assert.AreEqual("0xEFC9C8DD67B7C59B201BC164163A8978D40010C22743DB142A47F2E064480D4B", Utils.Bytes2HexString(secretKey.nonce));
+            Assert.True(Sr25519v091.Verify(simpleSign, pubKey, message));
+
         }
 
 
@@ -66,6 +75,24 @@ namespace SubstrateNetApiTests.Schnorrkel
             var simpleSign = Sr25519v011.SignSimple(pubKey, secKey, message);
 
             Assert.True(Sr25519v011.Verify(simpleSign, pubKey, message));
+        }
+
+        [Test]
+        public void SignatureVerify91Test()
+        {
+            string secKey0x = "0x33A6F3093F158A7109F679410BEF1A0C54168145E0CECB4DF006C1C2FFFB1F09925A225D97AA00682D6A59B95B18780C10D7032336E88F3442B42361F4A66011";
+
+            byte[] pubKey = Utils.GetPublicKeyFrom("5GrwvaEF5zXb26Fz9rcQpDWS57CtERHpNehXCPcNoHGKutQY"); ;
+            byte[] secKey = Utils.HexToByteArray(secKey0x);
+
+            int messageLength = _random.Next(10, 200);
+            var message = new byte[messageLength];
+            _random.NextBytes(message);
+
+            //var message = signaturePayloadBytes.AsMemory().Slice(0, (int)payloadLength).ToArray();
+            var simpleSign = Sr25519v091.SignSimple(pubKey, secKey, message);
+
+            Assert.True(Sr25519v091.Verify(simpleSign, pubKey, message));
         }
 
         [Test]

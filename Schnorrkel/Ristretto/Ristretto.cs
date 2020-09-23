@@ -52,7 +52,7 @@
         }
     }
 
-    internal class RistrettoPoint
+    public class RistrettoPoint
     {
         public EdwardsPoint Ep;
 
