@@ -120,5 +120,36 @@ namespace SubstrateNetApiTests.Schnorrkel
             Assert.True(true);
         }
 
+        [Test]
+        public void VerifyAndSignTest()
+        {
+            string secKey0x = "0x33A6F3093F158A7109F679410BEF1A0C54168145E0CECB4DF006C1C2FFFB1F09925A225D97AA00682D6A59B95B18780C10D7032336E88F3442B42361F4A66011";
+
+            byte[] pubKey = Utils.GetPublicKeyFrom("5GrwvaEF5zXb26Fz9rcQpDWS57CtERHpNehXCPcNoHGKutQY"); ;
+            byte[] secKey = Utils.HexToByteArray(secKey0x);
+            
+            var message = Utils.HexToByteArray("0x0400FF8EAF04151687736326C9FEA17E25FC5287613693C912909CB226AA4794F26A484913DC4F62090B18B6893C1431369461069EE3E9C1DA7F9F9A8C097C0CEBBEAC2BB9");
+
+            var signature1 = Sr25519v091.SignSimple(pubKey, secKey, message);
+
+            var signature1HexString = Utils.Bytes2HexString(signature1, Utils.HexStringFormat.PREFIXED);
+
+            // schnorrkel 0.9.1
+            Assert.True(Sr25519v091.Verify(signature1, pubKey, message));
+
+            // c-bindings verify
+            Assert.True(sr25519_dotnet.lib.SR25519.Verify(message, signature1, pubKey));
+        }
+
+        [Test]
+        public void SimpleTest()
+        {
+            byte[] pubKey = Utils.GetPublicKeyFrom("5GrwvaEF5zXb26Fz9rcQpDWS57CtERHpNehXCPcNoHGKutQY"); ;
+            var message = Utils.HexToByteArray("0x0400FF8EAF04151687736326C9FEA17E25FC5287613693C912909CB226AA4794F26A484913DC4F62090B18B6893C1431369461069EE3E9C1DA7F9F9A8C097C0CEBBEAC2BB9");
+            var signature = Utils.HexToByteArray("0xa61e9de53de6e4af819e9e75a6c6495f3620fe7ffed386708584395e6787e32e7b209860a190247b64c38201a12e16c1e8cbdd2fb9b0723bd9e88e32d3763689");
+
+            // c-bindings verify
+            Assert.True(sr25519_dotnet.lib.SR25519.Verify(message, signature, pubKey));
+        }
     }
 }

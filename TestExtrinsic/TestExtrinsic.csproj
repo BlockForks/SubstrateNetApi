@@ -6,6 +6,7 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\..\sr25519-dotnet_stiffff\sr25519-dotnet.lib\sr25519-dotnet.lib.csproj" />
     <ProjectReference Include="..\SubstrateNetApi\SubstrateNetApi.csproj" />
   </ItemGroup>
 
